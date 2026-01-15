@@ -115,7 +115,7 @@ Claude: [Uses mlflow_compare_runs]
 
 ```bash
 # Clone the repository
-git clone https://github.com/jeru/mlops-mcp-server.git
+git clone https://github.com/elliottdevo8/mlops-mcp-server.git
 cd mlops-mcp-server
 
 # Create virtual environment

@@ -59,10 +59,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jeru/mlops-mcp-server"
-Documentation = "https://github.com/jeru/mlops-mcp-server#readme"
-Repository = "https://github.com/jeru/mlops-mcp-server"
-Issues = "https://github.com/jeru/mlops-mcp-server/issues"
+Homepage = "https://github.com/elliottdevo8/mlops-mcp-server"
+Documentation = "https://github.com/elliottdevo8/mlops-mcp-server#readme"
+Repository = "https://github.com/elliottdevo8/mlops-mcp-server"
+Issues = "https://github.com/elliottdevo8/mlops-mcp-server/issues"
 
 [project.scripts]
 mlops-mcp-server = "mlops_mcp.server:main"
