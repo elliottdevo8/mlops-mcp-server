@@ -2,7 +2,7 @@
 
 import json
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, AsyncMock
 
 
 class MockExperiment:
@@ -79,7 +79,11 @@ class MockModelVersion:
 @pytest.fixture
 def mock_mlflow_client():
     """Create a mock MLflow client."""
-    with patch("mlops_mcp.utils.auth.get_mlflow_client") as mock:
+    # Clear the lru_cache before each test
+    from mlops_mcp.utils.auth import get_mlflow_client
+    get_mlflow_client.cache_clear()
+
+    with patch("mlops_mcp.tools.mlflow_tools.get_mlflow_client") as mock:
         client = MagicMock()
         mock.return_value = client
         yield client
@@ -135,14 +139,10 @@ async def test_mlflow_compare_runs(mock_mlflow_client):
     from mlops_mcp.tools.mlflow_tools import mlflow_compare_runs
 
     # Setup mock
-    def get_run_side_effect(run_id):
-        runs = {
-            "run1": MockRun("run1", "1", {"accuracy": 0.95, "f1": 0.93}, {}),
-            "run2": MockRun("run2", "1", {"accuracy": 0.92, "f1": 0.90}, {}),
-        }
-        return runs.get(run_id)
-
-    mock_mlflow_client.get_run.side_effect = get_run_side_effect
+    mock_mlflow_client.get_run.side_effect = [
+        MockRun("run1", "1", {"accuracy": 0.95, "f1": 0.93}, {}),
+        MockRun("run2", "1", {"accuracy": 0.92, "f1": 0.90}, {}),
+    ]
 
     # Execute
     result = await mlflow_compare_runs(
@@ -182,6 +182,30 @@ async def test_mlflow_get_best_run(mock_mlflow_client):
 
 
 @pytest.mark.asyncio
+async def test_mlflow_search_runs(mock_mlflow_client):
+    """Test searching runs with filter."""
+    from mlops_mcp.tools.mlflow_tools import mlflow_search_runs
+
+    # Setup mock - need experiments for the search
+    mock_mlflow_client.search_experiments.return_value = [
+        MockExperiment("1", "test-exp"),
+    ]
+    mock_mlflow_client.search_runs.return_value = [
+        MockRun("run1", "1", {"accuracy": 0.95}, {"model": "xgboost"}),
+    ]
+
+    # Execute
+    result = await mlflow_search_runs(
+        filter_string="metrics.accuracy > 0.9"
+    )
+    data = json.loads(result)
+
+    # Verify
+    assert data["count"] == 1
+    assert data["filter_applied"] == "metrics.accuracy > 0.9"
+
+
+@pytest.mark.asyncio
 async def test_mlflow_list_models(mock_mlflow_client):
     """Test listing registered models."""
     from mlops_mcp.tools.mlflow_tools import mlflow_list_models
@@ -208,7 +232,8 @@ async def test_mlflow_get_model_versions(mock_mlflow_client):
     from mlops_mcp.tools.mlflow_tools import mlflow_get_model_versions
 
     # Setup mock
-    mock_mlflow_client.get_registered_model.return_value = MockRegisteredModel("fraud-model")
+    mock_model = MockRegisteredModel("fraud-model")
+    mock_mlflow_client.get_registered_model.return_value = mock_model
     mock_mlflow_client.search_model_versions.return_value = [
         MockModelVersion("fraud-model", "1", "Archived"),
         MockModelVersion("fraud-model", "2", "Staging"),
@@ -231,7 +256,8 @@ async def test_mlflow_get_model_versions_filtered(mock_mlflow_client):
     from mlops_mcp.tools.mlflow_tools import mlflow_get_model_versions
 
     # Setup mock
-    mock_mlflow_client.get_registered_model.return_value = MockRegisteredModel("fraud-model")
+    mock_model = MockRegisteredModel("fraud-model")
+    mock_mlflow_client.get_registered_model.return_value = mock_model
     mock_mlflow_client.search_model_versions.return_value = [
         MockModelVersion("fraud-model", "1", "Archived"),
         MockModelVersion("fraud-model", "2", "Staging"),
