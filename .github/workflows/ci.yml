@@ -32,11 +32,11 @@ jobs:
 
       - name: Type check with mypy
         run: |
-          mypy src/ --ignore-missing-imports
+          python -m mypy src/ --ignore-missing-imports
 
       - name: Run tests
         run: |
-          pytest tests/ -v --cov=mlops_mcp --cov-report=xml
+          python -m pytest tests/ -v --cov=mlops_mcp --cov-report=xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4

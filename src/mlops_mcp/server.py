@@ -208,7 +208,7 @@ TOOLS: list[Tool] = [
 ]
 
 
-@server.list_tools()  # type: ignore[untyped-decorator]
+@server.list_tools()  # type: ignore[untyped-decorator, no-untyped-call]
 async def list_tools() -> list[Tool]:
     """Return list of available tools."""
     return TOOLS
