@@ -9,8 +9,8 @@ import structlog
 from mlops_mcp.utils.auth import get_mlflow_client
 from mlops_mcp.utils.errors import (
     ExperimentNotFoundError,
-    RunNotFoundError,
     ModelNotFoundError,
+    RunNotFoundError,
 )
 
 logger = structlog.get_logger()
@@ -149,7 +149,7 @@ async def mlflow_compare_runs(
     client = get_mlflow_client()
 
     runs_data = []
-    all_metrics = set()
+    all_metrics: set[str] = set()
 
     for run_id in run_ids:
         run = client.get_run(run_id)
@@ -168,10 +168,7 @@ async def mlflow_compare_runs(
         })
 
     # Filter to requested metrics if specified
-    if metric_names:
-        compare_metrics = metric_names
-    else:
-        compare_metrics = list(all_metrics)
+    compare_metrics = metric_names or list(all_metrics)
 
     # Build comparison table
     comparison_table = []
@@ -367,7 +364,7 @@ async def mlflow_get_model_versions(
     try:
         model = client.get_registered_model(model_name)
     except Exception:
-        raise ModelNotFoundError(model_name)
+        raise ModelNotFoundError(model_name) from None
 
     # Get all versions
     filter_str = f"name='{model_name}'"

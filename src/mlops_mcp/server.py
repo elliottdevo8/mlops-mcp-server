@@ -8,16 +8,17 @@ import structlog
 from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 from mlops_mcp.tools.mlflow_tools import (
-    mlflow_list_experiments,
-    mlflow_get_runs,
+    _format_result,
     mlflow_compare_runs,
     mlflow_get_best_run,
-    mlflow_search_runs,
-    mlflow_list_models,
     mlflow_get_model_versions,
+    mlflow_get_runs,
+    mlflow_list_experiments,
+    mlflow_list_models,
+    mlflow_search_runs,
 )
 
 # Load environment variables
@@ -207,13 +208,13 @@ TOOLS: list[Tool] = [
 ]
 
 
-@server.list_tools()
+@server.list_tools()  # type: ignore[no-untyped-call, untyped-decorator]
 async def list_tools() -> list[Tool]:
     """Return list of available tools."""
     return TOOLS
 
 
-@server.call_tool()
+@server.call_tool()  # type: ignore[untyped-decorator]
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     """Handle tool calls."""
     logger.info("tool_called", tool=name, arguments=arguments)
@@ -235,7 +236,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         elif name == "mlflow_get_model_versions":
             result = await mlflow_get_model_versions(**arguments)
         else:
-            result = {"error": f"Unknown tool: {name}"}
+            result = _format_result({"error": f"Unknown tool: {name}"})
 
         logger.info("tool_completed", tool=name, success=True)
         return [TextContent(type="text", text=str(result))]
@@ -245,14 +246,14 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
-async def run_server():
+async def run_server() -> None:
     """Run the MCP server."""
     logger.info("starting_mlops_mcp_server", version="0.1.0")
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-def main():
+def main() -> None:
     """Entry point for the MLOps MCP Server."""
     asyncio.run(run_server())
 
