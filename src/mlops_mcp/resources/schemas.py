@@ -6,7 +6,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-class ExperimentInfo(BaseModel):
+class ExperimentInfo(BaseModel):  # type: ignore[misc]
     """MLflow experiment information."""
 
     experiment_id: str
@@ -18,7 +18,7 @@ class ExperimentInfo(BaseModel):
     last_update_time: datetime | None = None
 
 
-class RunInfo(BaseModel):
+class RunInfo(BaseModel):  # type: ignore[misc]
     """MLflow run information."""
 
     run_id: str
@@ -30,7 +30,7 @@ class RunInfo(BaseModel):
     lifecycle_stage: str = "active"
 
 
-class RunMetrics(BaseModel):
+class RunMetrics(BaseModel):  # type: ignore[misc]
     """Metrics from an ML run."""
 
     run_id: str
@@ -39,7 +39,7 @@ class RunMetrics(BaseModel):
     tags: dict[str, str] = Field(default_factory=dict)
 
 
-class RunComparison(BaseModel):
+class RunComparison(BaseModel):  # type: ignore[misc]
     """Comparison of multiple runs."""
 
     runs: list[RunMetrics]
@@ -49,7 +49,7 @@ class RunComparison(BaseModel):
     comparison_metric: str | None = None
 
 
-class ModelVersion(BaseModel):
+class ModelVersion(BaseModel):  # type: ignore[misc]
     """Registered model version information."""
 
     name: str
@@ -64,7 +64,7 @@ class ModelVersion(BaseModel):
     tags: dict[str, str] = Field(default_factory=dict)
 
 
-class RegisteredModel(BaseModel):
+class RegisteredModel(BaseModel):  # type: ignore[misc]
     """Registered model information."""
 
     name: str
@@ -75,7 +75,7 @@ class RegisteredModel(BaseModel):
     tags: dict[str, str] = Field(default_factory=dict)
 
 
-class ToolResult(BaseModel):
+class ToolResult(BaseModel):  # type: ignore[misc]
     """Standard result wrapper for tool responses."""
 
     success: bool
