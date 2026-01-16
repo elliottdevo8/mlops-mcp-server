@@ -65,7 +65,7 @@ def get_wandb_api() -> Any:
         raise AuthenticationError("Weights & Biases", "WANDB_API_KEY not set")
 
     try:
-        import wandb  # type: ignore[import-not-found]
+        import wandb
         api = wandb.Api()
         logger.info("wandb_api_initialized")
         return api
@@ -93,7 +93,7 @@ def get_sagemaker_client() -> Any:
     from mlops_mcp.utils.errors import ConnectionError
 
     try:
-        import boto3  # type: ignore[import-not-found]
+        import boto3
         client = boto3.client("sagemaker")
         logger.info("sagemaker_client_initialized")
         return client
