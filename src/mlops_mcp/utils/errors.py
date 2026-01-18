@@ -20,7 +20,7 @@ class MLOpsMCPError(Exception):
         }
 
 
-class ConnectionError(MLOpsMCPError):
+class PlatformConnectionError(MLOpsMCPError):
     """Raised when connection to MLOps platform fails."""
 
     def __init__(self, platform: str, message: str) -> None:
