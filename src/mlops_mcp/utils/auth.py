@@ -29,11 +29,11 @@ def get_mlflow_client() -> Any:
         MlflowClient instance configured with tracking URI.
 
     Raises:
-        ConnectionError: If MLflow connection fails.
+        PlatformConnectionError: If MLflow connection fails.
     """
     from mlflow.tracking import MlflowClient
 
-    from mlops_mcp.utils.errors import ConnectionError
+    from mlops_mcp.utils.errors import PlatformConnectionError
 
     tracking_uri = get_tracking_uri()
 
@@ -43,7 +43,7 @@ def get_mlflow_client() -> Any:
         return client
     except Exception as e:
         logger.error("mlflow_connection_failed", error=str(e))
-        raise ConnectionError("MLflow", str(e)) from e
+        raise PlatformConnectionError("MLflow", str(e)) from e
 
 
 def get_wandb_api() -> Any:
@@ -56,9 +56,9 @@ def get_wandb_api() -> Any:
 
     Raises:
         AuthenticationError: If WANDB_API_KEY is not set.
-        ConnectionError: If W&B connection fails.
+        PlatformConnectionError: If W&B connection fails.
     """
-    from mlops_mcp.utils.errors import AuthenticationError, ConnectionError
+    from mlops_mcp.utils.errors import AuthenticationError, PlatformConnectionError
 
     api_key = os.getenv("WANDB_API_KEY")
     if not api_key:
@@ -70,10 +70,10 @@ def get_wandb_api() -> Any:
         logger.info("wandb_api_initialized")
         return api
     except ImportError:
-        raise ConnectionError("Weights & Biases", "wandb package not installed") from None
+        raise PlatformConnectionError("Weights & Biases", "wandb package not installed") from None
     except Exception as e:
         logger.error("wandb_connection_failed", error=str(e))
-        raise ConnectionError("Weights & Biases", str(e)) from e
+        raise PlatformConnectionError("Weights & Biases", str(e)) from e
 
 
 def get_sagemaker_client() -> Any:
@@ -88,9 +88,9 @@ def get_sagemaker_client() -> Any:
         boto3 SageMaker client.
 
     Raises:
-        ConnectionError: If SageMaker connection fails.
+        PlatformConnectionError: If SageMaker connection fails.
     """
-    from mlops_mcp.utils.errors import ConnectionError
+    from mlops_mcp.utils.errors import PlatformConnectionError
 
     try:
         import boto3
@@ -98,7 +98,7 @@ def get_sagemaker_client() -> Any:
         logger.info("sagemaker_client_initialized")
         return client
     except ImportError:
-        raise ConnectionError("SageMaker", "boto3 package not installed") from None
+        raise PlatformConnectionError("SageMaker", "boto3 package not installed") from None
     except Exception as e:
         logger.error("sagemaker_connection_failed", error=str(e))
-        raise ConnectionError("SageMaker", str(e)) from e
+        raise PlatformConnectionError("SageMaker", str(e)) from e
